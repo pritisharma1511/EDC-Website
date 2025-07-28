@@ -1,30 +1,43 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Card from './card'; // Adjust the import path as needed
 
 const TeamSection = () => {
+  const [animationStarted, setAnimationStarted] = useState(false);
+
+  useEffect(() => {
+    // Start animation immediately when component mounts
+    const timer = setTimeout(() => {
+      setAnimationStarted(true);
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <section className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
       <div className="w-full max-w-4xl">
         <motion.div
           initial={{ 
-            opacity: 0, 
-            scale: 0.8,
-            y: 50
+            scale: 6, 
+            opacity: 1,
+            zIndex: 20
           }}
-          animate={{ 
-            opacity: 1, 
-            scale: 1,
-            y: 0
+          animate={animationStarted ? { 
+            scale: 1, 
+            opacity: 1,
+            zIndex: 20
+          } : {
+            scale: 6, 
+            opacity: 1,
+            zIndex: 20
           }}
           transition={{ 
-            duration: 0.6,
-            ease: "easeOut",
-            delay: 0.2
+            duration: 2.5, 
+            ease: [0.25, 0.1, 0.25, 1]
           }}
-          whileHover={{
-            scale: 1.02,
-            transition: { duration: 0.2 }
+          style={{
+            position: 'relative'
           }}
         >
           <Card
@@ -34,8 +47,10 @@ const TeamSection = () => {
             titleSize="text-5xl"
             contentSize="text-3xl"
             customPadding="p-12"
-            customShadow={"shadow-2xl"}
+            customShadow="shadow-2xl"
             className="max-w-3xl mx-auto rounded-3xl [&_.card-header_h3]:mb-6"
+            initial={{ opacity: 1, y: 0, scale: 1 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
           />
         </motion.div>
       </div>

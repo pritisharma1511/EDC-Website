@@ -1,71 +1,48 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import Card from './card'; // Import your Card component
+import Card from './card'; // Import your reusable Card component
 
 const AboutUsLayout = () => {
-  const [showSideCards, setShowSideCards] = useState(false);
+  const [animationStarted, setAnimationStarted] = useState(false);
 
-  // Trigger side cards animation after about us card completes its scaling
   useEffect(() => {
+    // Start animation immediately when component mounts
     const timer = setTimeout(() => {
-      setShowSideCards(true);
-    }, 1200); // Reduced delay to match faster About Us animation
+      setAnimationStarted(true);
+    }, 100);
 
     return () => clearTimeout(timer);
   }, []);
 
-  // Icon component for the About Us card - matches the black circle with white P
-  const PIcon = () => (
-    <div className="w-10 h-10 bg-black text-white rounded-full flex items-center justify-center font-bold text-lg shadow-lg">
-      P
-    </div>
-  );
-
   return (
     <div className="min-h-screen bg-white flex items-center justify-center p-8">
       <div className="w-full max-w-7xl mx-auto">
-        {/* Main container with 3D perspective */}
-        <div 
-          className="relative flex flex-col lg:flex-row items-center justify-center gap-6 lg:gap-8"
-          style={{ 
-            perspective: '1500px',
-            transformStyle: 'preserve-3d'
-          }}
-        >
+        {/* Main container */}
+        <div className="relative flex flex-col lg:flex-row items-center justify-center gap-6 lg:gap-8">
           
-          {/* Vision Card - Starts behind and slides out */}
+          {/* Vision Card - Starts at center position, splits to left during scaling */}
           <motion.div
             className="w-full max-w-sm lg:max-w-sm xl:max-w-sm order-2 lg:order-1 lg:mt-5"
             initial={{ 
-              scale: 0.7,
-              opacity: 0,
-              rotateY: 15,
-              translateZ: -200,
-              translateX: 100
+              scale: 6,
+              opacity: 1,
+              zIndex: 1,
+              x: "200%" // Start at center position (behind About Us)
             }}
-            animate={showSideCards ? { 
+            animate={animationStarted ? { 
               scale: 1,
               opacity: 1,
-              rotateY: 0,
-              translateZ: 0,
-              translateX: 0
-            } : { 
-              scale: 0.7,
-              opacity: 0,
-              rotateY: 15,
-              translateZ: -200,
-              translateX: 100
+              zIndex: 1,
+              x: 0 // Split to final left position
+            } : {
+              scale: 6,
+              opacity: 1,
+              zIndex: 1,
+              x: "200%"
             }}
             transition={{ 
-              duration: 1.2, 
-              ease: [0.25, 0.46, 0.45, 0.94],
-              type: "spring",
-              stiffness: 60,
-              damping: 20
-            }}
-            style={{
-              transformStyle: "preserve-3d",
-              zIndex: 1
+              duration: 2.5, 
+              ease: [0.25, 0.1, 0.25, 1]
             }}
           >
             <Card
@@ -75,39 +52,37 @@ const AboutUsLayout = () => {
               customPadding="p-6"
               titleSize="text-xl"
               contentSize="text-xl"
-              iconSize="w-5 h-5"
               spacing="space-y-3"
               customShadow="shadow-xl"
               className="h-full rounded-3xl"
+              initial={{ opacity: 1, y: 0, scale: 1 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
             />
           </motion.div>
 
-          {/* About Us Card - Starts large and shrinks, stays in front */}
+          {/* About Us Card - Scales from 6x to 1x, stays in front with highest z-index */}
           <motion.div
             className="w-full max-w-2xl lg:max-w-2xl xl:max-w-3xl order-1 lg:order-2"
             initial={{ 
               scale: 6, 
-              opacity: 0.9,
-              translateZ: 50,
-              rotateX: 5
+              opacity: 1,
+              zIndex: 20
             }}
-            animate={{ 
+            animate={animationStarted ? { 
               scale: 1, 
               opacity: 1,
-              translateZ: 0,
-              rotateX: 0
+              zIndex: 20
+            } : {
+              scale: 6, 
+              opacity: 1,
+              zIndex: 20
             }}
             transition={{ 
-              duration: 1.2, 
-              ease: [0.16, 1, 0.3, 1],
-              stiffness: 80,
-              damping: 25,
-              mass: 1
+              duration: 2.5, 
+              ease: [0.25, 0.1, 0.25, 1]
             }}
             style={{
-              transformStyle: "preserve-3d",
-              zIndex: 10,
-              willChange: "transform, opacity"
+              position: 'relative'
             }}
           >
             <Card
@@ -118,48 +93,38 @@ const AboutUsLayout = () => {
               customPadding="p-12 pt-16"
               titleSize="text-4xl"
               contentSize="text-2xl"
-              iconSize="w-8 h-8"
               spacing="space-y-6"
               customShadow="shadow-2xl"
-              iconPosition="topRight"
               className="h-full rounded-3xl relative min-h-[400px]"
+              initial={{ opacity: 1, y: 0, scale: 1 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
             />
           </motion.div>
 
-          {/* Mission Card - Starts behind and slides out */}
+          {/* Mission Card - Now appears simultaneously with other cards */}
           <motion.div
             className="w-full max-w-sm lg:max-w-sm xl:max-w-sm order-3 lg:order-3 lg:mt-5"
             initial={{ 
-              scale: 0.7,
-              opacity: 0,
-              rotateY: -15,
-              translateZ: -200,
-              translateX: -100
+              scale: 6,
+              opacity: 1,
+              zIndex: 1,
+              x: "-200%" // Start at center position (behind About Us), mirroring Vision card
             }}
-            animate={showSideCards ? { 
+            animate={animationStarted ? { 
               scale: 1,
               opacity: 1,
-              rotateY: 0,
-              translateZ: 0,
-              translateX: 0
-            } : { 
-              scale: 0.7,
-              opacity: 0,
-              rotateY: -15,
-              translateZ: -200,
-              translateX: -100
+              zIndex: 1,
+              x: 0 // Split to final right position
+            } : {
+              scale: 6,
+              opacity: 1,
+              zIndex: 1,
+              x: "-200%"
             }}
             transition={{ 
-              duration: 1.2, 
-              ease: [0.25, 0.46, 0.45, 0.94],
-              type: "spring",
-              stiffness: 60,
-              damping: 20,
-              delay: 0.2 // Slight delay after Vision card for staggered effect
-            }}
-            style={{
-              transformStyle: "preserve-3d",
-              zIndex: 1
+              duration: 2.5, 
+              ease: [0.25, 0.1, 0.25, 1]
+              // Removed delay: 1.8 to make it synchronous
             }}
           >
             <Card
@@ -169,10 +134,11 @@ const AboutUsLayout = () => {
               customPadding="p-6"
               titleSize="text-xl"
               contentSize="text-xl"
-              iconSize="w-5 h-5"
               spacing="space-y-3"
               customShadow="shadow-xl"
               className="h-full rounded-3xl"
+              initial={{ opacity: 1, y: 0, scale: 1 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
             />
           </motion.div>
         </div>
