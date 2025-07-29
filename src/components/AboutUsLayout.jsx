@@ -20,25 +20,25 @@ const AboutUsLayout = () => {
         {/* Main container */}
         <div className="relative flex flex-col lg:flex-row items-center justify-center gap-6 lg:gap-8">
           
-          {/* Vision Card - Starts at center position, splits to left during scaling */}
+          {/* Vision Card - Starts hidden behind About Us, moves directly to left position */}
           <motion.div
             className="w-full max-w-sm lg:max-w-sm xl:max-w-sm order-2 lg:order-1 lg:mt-5"
             initial={{ 
               scale: 2,
               opacity: 1,
               zIndex: 1,
-              x: "200%" // Start at center position (behind About Us)
+              x: "100%" // Start slightly offset to the right
             }}
             animate={animationStarted ? { 
               scale: 1,
               opacity: 1,
               zIndex: 1,
-              x: 0 // Split to final left position
+              x: 0 // Move to final left position
             } : {
               scale: 2,
               opacity: 1,
               zIndex: 1,
-              x: "200%"
+              x: "100%"
             }}
             transition={{ 
               duration: 2.5, 
@@ -60,7 +60,7 @@ const AboutUsLayout = () => {
             />
           </motion.div>
 
-          {/* About Us Card - Scales from 4x to 1x, stays in front with highest z-index */}
+          {/* About Us Card - Scales from 2x to 1x, stays in front with highest z-index */}
           <motion.div
             className="w-full max-w-2xl lg:max-w-2xl xl:max-w-3xl order-1 lg:order-2"
             initial={{ 
@@ -101,30 +101,29 @@ const AboutUsLayout = () => {
             />
           </motion.div>
 
-          {/* Mission Card - Now appears simultaneously with other cards */}
+          {/* Mission Card - Starts hidden behind About Us, moves directly to right position */}
           <motion.div
             className="w-full max-w-sm lg:max-w-sm xl:max-w-sm order-3 lg:order-3 lg:mt-5"
             initial={{ 
               scale: 2,
               opacity: 1,
               zIndex: 1,
-              x: "-200%" // Start at center position (behind About Us), mirroring Vision card
+              x: "-100%" // Start slightly offset to the left
             }}
             animate={animationStarted ? { 
               scale: 1,
               opacity: 1,
               zIndex: 1,
-              x: 0 // Split to final right position
+              x: 0 // Move to final right position
             } : {
               scale: 2,
               opacity: 1,
               zIndex: 1,
-              x: "-200%"
+              x: "-100%"
             }}
             transition={{ 
               duration: 2.5, 
               ease: [0.25, 0.1, 0.25, 1]
-              // Removed delay: 1.8 to make it synchronous
             }}
           >
             <Card
