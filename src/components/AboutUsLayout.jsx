@@ -24,7 +24,7 @@ const AboutUsLayout = () => {
           <motion.div
             className="w-full max-w-sm lg:max-w-sm xl:max-w-sm order-2 lg:order-1 lg:mt-5"
             initial={{ 
-              scale: 6,
+              scale: 2,
               opacity: 1,
               zIndex: 1,
               x: "200%" // Start at center position (behind About Us)
@@ -35,7 +35,7 @@ const AboutUsLayout = () => {
               zIndex: 1,
               x: 0 // Split to final left position
             } : {
-              scale: 6,
+              scale: 2,
               opacity: 1,
               zIndex: 1,
               x: "200%"
@@ -60,11 +60,11 @@ const AboutUsLayout = () => {
             />
           </motion.div>
 
-          {/* About Us Card - Scales from 6x to 1x, stays in front with highest z-index */}
+          {/* About Us Card - Scales from 4x to 1x, stays in front with highest z-index */}
           <motion.div
             className="w-full max-w-2xl lg:max-w-2xl xl:max-w-3xl order-1 lg:order-2"
             initial={{ 
-              scale: 6, 
+              scale: 2, 
               opacity: 1,
               zIndex: 20
             }}
@@ -73,7 +73,7 @@ const AboutUsLayout = () => {
               opacity: 1,
               zIndex: 20
             } : {
-              scale: 6, 
+              scale: 2, 
               opacity: 1,
               zIndex: 20
             }}
@@ -105,7 +105,7 @@ const AboutUsLayout = () => {
           <motion.div
             className="w-full max-w-sm lg:max-w-sm xl:max-w-sm order-3 lg:order-3 lg:mt-5"
             initial={{ 
-              scale: 6,
+              scale: 2,
               opacity: 1,
               zIndex: 1,
               x: "-200%" // Start at center position (behind About Us), mirroring Vision card
@@ -116,7 +116,7 @@ const AboutUsLayout = () => {
               zIndex: 1,
               x: 0 // Split to final right position
             } : {
-              scale: 6,
+              scale: 2,
               opacity: 1,
               zIndex: 1,
               x: "-200%"

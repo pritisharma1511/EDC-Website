@@ -19,7 +19,7 @@ const TeamSection = () => {
       <div className="w-full max-w-4xl">
         <motion.div
           initial={{ 
-            scale: 6, 
+            scale: 2, 
             opacity: 1,
             zIndex: 20
           }}
@@ -28,7 +28,7 @@ const TeamSection = () => {
             opacity: 1,
             zIndex: 20
           } : {
-            scale: 6, 
+            scale: 2, 
             opacity: 1,
             zIndex: 20
           }}
