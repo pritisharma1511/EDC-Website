@@ -1,53 +1,66 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 
 const Gallery = () => {
   const [images, setImages] = useState([]);
   const [imagesLoaded, setImagesLoaded] = useState(false);
   const [hoveredIndex, setHoveredIndex] = useState(null);
 
-  // Image data that will be loaded dynamically
+  // Image data using local assets
   const imageData = [
-    { id: 1, src: 'https://picsum.photos/400/600?random=1', alt: 'Gallery Image 1' },
-    { id: 2, src: 'https://picsum.photos/300/200?random=2', alt: 'Gallery Image 2' },
-    { id: 3, src: 'https://picsum.photos/300/200?random=3', alt: 'Gallery Image 3' },
-    { id: 4, src: 'https://picsum.photos/300/200?random=4', alt: 'Gallery Image 4' },
-    { id: 5, src: 'https://picsum.photos/300/200?random=5', alt: 'Gallery Image 5' },
-    { id: 6, src: 'https://picsum.photos/200/300?random=6', alt: 'Gallery Image 6' },
-    { id: 7, src: 'https://picsum.photos/300/200?random=7', alt: 'Gallery Image 7' },
-    { id: 8, src: 'https://picsum.photos/300/200?random=8', alt: 'Gallery Image 8' },
-    { id: 9, src: 'https://picsum.photos/300/200?random=9', alt: 'Gallery Image 9' },
-    { id: 10, src: 'https://picsum.photos/200/150?random=10', alt: 'Gallery Image 10' },
-    { id: 11, src: 'https://picsum.photos/200/150?random=11', alt: 'Gallery Image 11' },
-    { id: 12, src: 'https://picsum.photos/200/300?random=12', alt: 'Gallery Image 12' },
-    { id: 13, src: 'https://picsum.photos/300/200?random=13', alt: 'Gallery Image 13' },
-    { id: 14, src: 'https://picsum.photos/300/200?random=14', alt: 'Gallery Image 14' },
+    { id: 1, src: '/src/assets/img1.jpg', alt: 'Gallery Image 1' },
+    { id: 2, src: '/src/assets/img2.jpg', alt: 'Gallery Image 2' },
+    { id: 3, src: '/src/assets/img3.jpg', alt: 'Gallery Image 3' },
+    { id: 4, src: '/src/assets/img4.jpg', alt: 'Gallery Image 4' },
+    { id: 5, src: '/src/assets/img5.jpg', alt: 'Gallery Image 5' },
+    { id: 6, src: '/src/assets/img6.jpg', alt: 'Gallery Image 6' },
+    { id: 7, src: '/src/assets/img7.jpg', alt: 'Gallery Image 7' },
+    { id: 8, src: '/src/assets/img8.jpg', alt: 'Gallery Image 8' },
+    { id: 9, src: '/src/assets/img9.jpg', alt: 'Gallery Image 9' },
+    { id: 10, src: '/src/assets/img10.jpg', alt: 'Gallery Image 10' },
+    { id: 11, src: '/src/assets/img11.jpg', alt: 'Gallery Image 11' },
+    { id: 12, src: '/src/assets/img12.jpg', alt: 'Gallery Image 12' },
+    { id: 13, src: '/src/assets/img13.jpg', alt: 'Gallery Image 13' },
+    { id: 14, src: '/src/assets/img14.jpg', alt: 'Gallery Image 14' },
+    { id: 15, src: '/src/assets/img15.jpg', alt: 'Gallery Image 15' },
+    { id: 16, src: '/src/assets/img16.jpg', alt: 'Gallery Image 16' },
   ];
 
-  // Load images and get their natural dimensions
+  // Load images with proper aspect ratios and fallbacks
   useEffect(() => {
     const loadImages = async () => {
       const loadedImages = await Promise.all(
-        imageData.map(async (img) => {
+        imageData.map(async (img, index) => {
           return new Promise((resolve) => {
-            const image = new Image();
-            image.onload = () => {
+            const imageElement = new Image();
+            imageElement.onload = () => {
               resolve({
                 ...img,
-                naturalWidth: image.naturalWidth,
-                naturalHeight: image.naturalHeight,
-                aspectRatio: image.naturalWidth / image.naturalHeight
+                naturalWidth: imageElement.naturalWidth,
+                naturalHeight: imageElement.naturalHeight,
+                aspectRatio: imageElement.naturalWidth / imageElement.naturalHeight
               });
             };
-            image.onerror = () => {
+            imageElement.onerror = () => {
+              // Fallback with SVG data URL if local image fails to load
+              const svgContent = `<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="grad${index}" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+                  </linearGradient>
+                </defs>
+                <rect width="400" height="300" fill="url(#grad${index})"/>
+                <text x="200" y="150" text-anchor="middle" dominant-baseline="middle" fill="white" font-family="Arial, sans-serif" font-size="16" font-weight="500">${img.alt}</text>
+              </svg>`;
               resolve({
                 ...img,
+                src: `data:image/svg+xml;base64,${btoa(svgContent)}`,
                 naturalWidth: 400,
                 naturalHeight: 300,
                 aspectRatio: 4/3
               });
             };
-            image.src = img.src;
+            imageElement.src = img.src;
           });
         })
       );
@@ -58,7 +71,7 @@ const Gallery = () => {
     loadImages();
   }, []);
 
-  // Grid layout positions matching the design exactly
+  // Grid layout positions matching the design exactly - using first 14 images
   const gridItems = [
     // Row 1
     { gridArea: "1 / 1 / 3 / 3", index: 0, row: 1, col: 1, rowSpan: 2, colSpan: 2 },
@@ -83,7 +96,7 @@ const Gallery = () => {
     { gridArea: "4 / 2 / 5 / 3", index: 13, row: 4, col: 2, rowSpan: 1, colSpan: 1 },
   ];
 
-  // Calculate dynamic transform for neighboring images
+  // Calculate dynamic transform for neighboring images with reduced spacing
   const getNeighborTransform = (currentItem, hoveredItem) => {
     if (!hoveredItem || currentItem.index === hoveredItem.index) {
       return { x: 0, y: 0, scale: 1 };
@@ -93,195 +106,151 @@ const Gallery = () => {
     const dy = currentItem.row - hoveredItem.row;
     const distance = Math.sqrt(dx * dx + dy * dy);
     
-    // Only affect nearby items (within 2 grid units)
-    if (distance > 2.5) {
+    // Affect items within a smaller radius
+    if (distance > 3) {
       return { x: 0, y: 0, scale: 1 };
     }
 
-    // Calculate push direction and intensity
-    const pushIntensity = Math.max(0, (2.5 - distance) / 2.5);
-    const pushX = dx !== 0 ? (dx / Math.abs(dx)) * 25 * pushIntensity : 0;
-    const pushY = dy !== 0 ? (dy / Math.abs(dy)) * 15 * pushIntensity : 0;
+    // Calculate push direction and intensity with reduced spacing
+    const pushIntensity = Math.max(0, (3 - distance) / 3);
+    
+    // Reduced push distances for more subtle movement
+    const pushX = dx !== 0 ? (dx / Math.abs(dx)) * 30 * pushIntensity : 0;
+    const pushY = dy !== 0 ? (dy / Math.abs(dy)) * 20 * pushIntensity : 0;
+    
+    // Reduced margin multiplier for more subtle spacing
+    const marginMultiplier = distance < 1.5 ? 1.2 : 1;
     
     return {
-      x: pushX,
-      y: pushY,
-      scale: 1 - (pushIntensity * 0.05) // Slight scale down for pushed items
+      x: pushX * marginMultiplier,
+      y: pushY * marginMultiplier,
+      scale: Math.max(0.85, 1 - (pushIntensity * 0.15)) // Less dramatic scale down
     };
   };
 
+  // Show loading state while images are loading
+  if (!imagesLoaded) {
+    return (
+      <div className="min-h-screen bg-blue-600 flex items-center justify-center">
+        <div className="text-white text-2xl font-semibold flex items-center space-x-3">
+          <div className="w-8 h-8 border-4 border-white/30 border-t-white rounded-full animate-spin" />
+          <span>Loading Gallery...</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-blue-600 p-8">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-blue-600 p-8 overflow-hidden">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <motion.h1 
-          initial={{ opacity: 0, y: -30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="text-5xl md:text-6xl font-bold text-white mb-12"
-        >
+        <h1 className="text-5xl md:text-6xl font-bold text-white mb-12 text-center opacity-0 animate-[fadeInUp_0.8s_ease-out_forwards]">
           Our Gallery
-        </motion.h1>
+        </h1>
 
-        {/* Grid Layout matching the design */}
-        <motion.div 
-          className="grid grid-cols-5 grid-rows-4 gap-4 h-[600px] w-full relative"
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
+        {/* Grid Layout with reduced container padding */}
+        <div 
+          className="grid grid-cols-5 grid-rows-4 gap-4 h-[600px] w-full relative opacity-0 animate-[fadeInScale_0.8s_ease-out_0.2s_forwards]"
+          style={{
+            // Reduced padding for more subtle scaling accommodation
+            padding: hoveredIndex !== null ? '40px' : '20px',
+            transition: 'padding 0.4s ease-out'
+          }}
         >
-          <AnimatePresence>
-            {gridItems.map((item, idx) => {
-              const image = images[item.index];
-              if (!image) return null;
+          {gridItems.map((item, idx) => {
+            const image = images[item.index];
+            if (!image) return null;
 
-              const isHovered = hoveredIndex === idx;
-              const hoveredItem = hoveredIndex !== null ? gridItems[hoveredIndex] : null;
-              const neighborTransform = getNeighborTransform(item, hoveredItem);
+            const isHovered = hoveredIndex === idx;
+            const hoveredItem = hoveredIndex !== null ? gridItems[hoveredIndex] : null;
+            const neighborTransform = getNeighborTransform(item, hoveredItem);
 
-              return (
-                <motion.div
-                  key={`${image.id}-${idx}`}
-                  className="bg-gray-200 rounded-lg overflow-hidden shadow-lg cursor-pointer group relative"
-                  style={{ gridArea: item.gridArea }}
-                  initial={{ 
-                    opacity: 0, 
-                    scale: 0.8,
-                    rotateY: -45
+            return (
+              <div
+                key={`${image.id}-${idx}`}
+                className="bg-gray-200 rounded-lg overflow-hidden shadow-lg cursor-pointer group relative transition-all duration-500 ease-out"
+                style={{ 
+                  gridArea: item.gridArea,
+                  transform: `scale(${isHovered ? 1.6 : neighborTransform.scale}) translateX(${neighborTransform.x}px) translateY(${neighborTransform.y}px)`,
+                  zIndex: isHovered ? 100 : hoveredIndex !== null ? 10 : 1,
+                  animationDelay: `${idx * 0.05}s`
+                }}
+                onMouseEnter={() => setHoveredIndex(idx)}
+                onMouseLeave={() => setHoveredIndex(null)}
+              >
+                <img
+                  src={image.src}
+                  alt={image.alt}
+                  className="w-full h-full object-cover transition-all duration-400 ease-out"
+                  style={{
+                    transform: `scale(${isHovered ? 1.05 : 1})`,
+                    filter: `brightness(${isHovered ? 1.15 : 1}) contrast(${isHovered ? 1.1 : 1})`
                   }}
-                  animate={{ 
-                    opacity: 1, 
-                    scale: isHovered ? 1.15 : neighborTransform.scale,
-                    rotateY: 0,
-                    x: neighborTransform.x,
-                    y: neighborTransform.y,
-                    zIndex: isHovered ? 50 : hoveredIndex !== null ? 10 : 1
-                  }}
-                  transition={{ 
-                    duration: isHovered ? 0.4 : 0.6, 
-                    delay: isHovered ? 0 : idx * 0.1,
-                    ease: "easeOut",
-                    scale: { type: "spring", stiffness: 300, damping: 25 },
-                    x: { type: "spring", stiffness: 400, damping: 30 },
-                    y: { type: "spring", stiffness: 400, damping: 30 }
-                  }}
-                  onHoverStart={() => setHoveredIndex(idx)}
-                  onHoverEnd={() => setHoveredIndex(null)}
-                  whileTap={{ scale: isHovered ? 1.08 : 0.95 }}
-                >
-                  <motion.img
-                    src={image.src}
-                    alt={image.alt}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                    animate={{
-                      scale: isHovered ? 1.1 : 1,
-                      brightness: isHovered ? 1.1 : 1
-                    }}
-                    transition={{ duration: 0.4, ease: "easeOut" }}
-                  />
-                  
-                  {/* Enhanced Hover Overlay */}
-                  <motion.div 
-                    className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-center justify-center"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: isHovered ? 1 : 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <motion.div
-                      initial={{ y: 20, opacity: 0, scale: 0.8 }}
-                      animate={{ 
-                        y: isHovered ? 0 : 20, 
-                        opacity: isHovered ? 1 : 0,
-                        scale: isHovered ? 1 : 0.8
-                      }}
-                      transition={{ 
-                        delay: isHovered ? 0.15 : 0, 
-                        duration: 0.3,
-                        type: "spring",
-                        stiffness: 400,
-                        damping: 25
-                      }}
-                      className="text-white text-center"
-                    >
-                      <div className="bg-white/25 backdrop-blur-md rounded-full px-6 py-3 border border-white/20">
-                        <span className="text-sm font-semibold">View Image</span>
-                      </div>
-                    </motion.div>
-                  </motion.div>
+                  loading="lazy"
+                />
 
-                  {/* Enhanced Shimmer effect */}
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -skew-x-12"
-                    initial={{ x: '-100%', opacity: 0 }}
-                    animate={{
-                      x: isHovered ? '200%' : '-100%',
-                      opacity: isHovered ? 1 : 0
-                    }}
-                    transition={{ 
-                      duration: 0.8, 
-                      ease: "easeInOut",
-                      delay: isHovered ? 0.2 : 0
-                    }}
-                  />
-
-                  {/* Dynamic corner accent */}
-                  <motion.div 
-                    className="absolute top-0 right-0 border-l-transparent"
-                    style={{
-                      width: 0,
-                      height: 0,
-                      borderLeftWidth: '20px',
-                      borderBottomWidth: '20px',
-                      borderBottomColor: isHovered ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.2)'
-                    }}
-                    animate={{
-                      borderLeftWidth: isHovered ? '30px' : '20px',
-                      borderBottomWidth: isHovered ? '30px' : '20px'
-                    }}
-                    transition={{ duration: 0.3 }}
-                  />
-
-                  {/* Pulsing border effect when hovered */}
-                  {isHovered && (
-                    <motion.div
-                      className="absolute inset-0 rounded-lg border-2 border-white/50"
-                      initial={{ opacity: 0, scale: 1 }}
-                      animate={{ 
-                        opacity: [0, 1, 0],
-                        scale: [1, 1.02, 1]
-                      }}
-                      transition={{ 
-                        duration: 1.5,
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                      }}
-                    />
-                  )}
-                </motion.div>
-              );
-            })}
-          </AnimatePresence>
-        </motion.div>
+                {/* Enhanced image overlay for better visibility when scaled */}
+                {isHovered && (
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-black/10 opacity-0 animate-[fadeIn_0.4s_ease-out_forwards]" />
+                )}
+              </div>
+            );
+          })}
+        </div>
 
         {/* Footer text */}
-        <motion.div 
-          className="text-center mt-12"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.8 }}
-        >
-          <p className="text-white text-lg opacity-90">
+        <div className="text-center mt-16 opacity-0 animate-[fadeInUp_0.8s_ease-out_0.8s_forwards]">
+          <p className="text-white text-lg opacity-90 mb-2">
             Discover our collection of stunning visuals
           </p>
-          <motion.div 
-            className="w-24 h-1 bg-white/30 mx-auto mt-4 rounded-full"
-            initial={{ width: 0 }}
-            animate={{ width: 96 }}
-            transition={{ duration: 0.8, delay: 1.2 }}
-          />
-        </motion.div>
+          <p className="text-white/70 text-sm">
+            Hover over any image to see it in full detail
+          </p>
+          <div className="w-24 h-1 bg-white/30 mx-auto mt-6 rounded-full animate-[expandWidth_0.8s_ease-out_1.2s_forwards]" />
+        </div>
       </div>
+      
+      <style jsx>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        @keyframes fadeInScale {
+          from {
+            opacity: 0;
+            transform: scale(0.95);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+        
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+        
+        @keyframes expandWidth {
+          from {
+            width: 0;
+          }
+          to {
+            width: 96px;
+          }
+        }
+      `}</style>
     </div>
   );
 };
